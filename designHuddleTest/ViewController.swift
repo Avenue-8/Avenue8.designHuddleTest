@@ -53,7 +53,7 @@ class ViewController: UIViewController, WKScriptMessageHandler {
     }
     
     private func load() {
-        let urlString = "https://staging.avenue8.com/account/home/tools?mbd=true&agentId=133&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmN1cy5zYW5hdGFuQGF2ZW51ZTguY29tIiwic3ViIjoxMzMsImlhdCI6MTY0MDAyODcxNywiZXhwIjoxNjQwMTE1MTE3fQ.AcxofyfxXOhfpBnnOffTg6Q4uV9Fc92YrO5mvX3_PFs"
+        let urlString = "https://staging.avenue8.com/account/home/tools?mbd=true&agentId=133&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmN1cy5zYW5hdGFuQGF2ZW51ZTguY29tIiwic3ViIjoxMzMsImlhdCI6MTY0MDAyODcxNywiZXhwIjoxNjQwMTY2MTE3fQ.zf4KzXiAB7wqybNykEw86jrH-dxeB2Adx86uo_qXMBs"
         guard let url = URL(string: urlString) else { fatalError("url not valid") }
         webView.load(URLRequest(url: url))
     }
