@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler {
+class ViewController: UIViewController, WKScriptMessageHandler {
 
     var webView: WKWebView!
 
@@ -42,6 +42,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         config.userContentController = contentController
         webView = WKWebView( frame: .zero, configuration: config)
         webView.allowsBackForwardNavigationGestures = false
+        webView.navigationDelegate = self
         webView.configuration.dataDetectorTypes = [.phoneNumber]
         
         WebIntegration.allCases.forEach { action in
@@ -63,6 +64,28 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
             
 }
+
+extension ViewController: WKNavigationDelegate {
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
+        print("Will load url: \n \(url.absoluteString)")
+        decisionHandler(.allow)
+    }
+    
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("didFailProvisionalNavigation \(error.localizedDescription)")
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print("didFail Navigation \(error.localizedDescription)")
+    }
+
+}
+
 
 enum WebIntegration: String {
     case facebook = "facebook"
