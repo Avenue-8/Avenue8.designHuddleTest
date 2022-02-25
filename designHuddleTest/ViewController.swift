@@ -44,20 +44,25 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         webView.allowsBackForwardNavigationGestures = false
         webView.navigationDelegate = self
         webView.configuration.dataDetectorTypes = [.phoneNumber]
-        
-        WebIntegration.allCases.forEach { action in
-            contentController.add(self, name: action.rawValue)
-        }
-        
+
         view.addSubview(self.webView)
     }
     
     private func load() {
-        let urlString = "https://staging.avenue8.com/account/home/tools?mbd=true&agentId=133&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmN1cy5zYW5hdGFuQGF2ZW51ZTguY29tIiwic3ViIjoxMzMsImlhdCI6MTY0MDAyODcxNywiZXhwIjoxNjQwMTY2MTE3fQ.zf4KzXiAB7wqybNykEw86jrH-dxeB2Adx86uo_qXMBs"
+        let urlString = "https://design.avenue8.com/editor?token=419b86c7bcf8dce473e08b8ed9f6f49c57552d9b&project_id=c8cges34jjwg028h8pyg"
         guard let url = URL(string: urlString) else { fatalError("url not valid") }
         webView.load(URLRequest(url: url))
     }
     
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        let exceptions = SecTrustCopyExceptions(serverTrust)
+        SecTrustSetExceptions(serverTrust, exceptions)
+        completionHandler(.useCredential, URLCredential(trust: serverTrust));
+    }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print("message received \(message.name)")
@@ -68,6 +73,10 @@ class ViewController: UIViewController, WKScriptMessageHandler {
 extension ViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard navigationAction.targetFrame?.isMainFrame != false else {
+           decisionHandler(.allow)
+           return
+         }
         guard let url = navigationAction.request.url else {
             decisionHandler(.allow)
             return
@@ -82,46 +91,6 @@ extension ViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         print("didFail Navigation \(error.localizedDescription)")
-    }
-
-}
-
-
-enum WebIntegration: String {
-    case facebook = "facebook"
-    case instagram = "instagram"
-    case download = "download"
-    case processPDF = "PDF"
-    case processCSV = "CSV"
-    case meMarketingRequest = "meMarketingRequest"
-    case exit = "exit"
-    case hideBackButton = "hideBackButton"
-    case enableBackButton = "enableBackButton"
-    case presentActionSheet = "presentActionSheet"
-    case backHome = "backHome"
-    case share = "share"
-    case processZIP = "ZIP"
-    case toggleSidebar = "toggleSidebar"
-    case showAppMenu = "showAppMenu"
-
-    static var allCases: [WebIntegration] {
-        return [
-            .facebook,
-            .instagram,
-            .download,
-            .processPDF,
-            .processCSV,
-            .meMarketingRequest,
-            .exit,
-            .hideBackButton,
-            .enableBackButton,
-            .presentActionSheet,
-            .backHome,
-            .share,
-            .processZIP,
-            .toggleSidebar,
-            .showAppMenu,
-            ]
     }
 
 }
